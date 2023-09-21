@@ -10,3 +10,4 @@
 
 ## running
 - H@H
+- 200 USD bot
