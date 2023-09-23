@@ -14,7 +14,8 @@ class Client(botpy.Client):
         elif "/提问" in message.content:
             await self.question(message)
         elif "/频道" in message.content:
-            botpy.logger.info(self.api.get_guild(guild_id=message.guild_id))
+            botpy.logger.info(await self.api.get_guild(guild_id=message.guild_id))
+            botpy.logger.info(await self.api.get_channels(guild_id=message.guild_id))
             await self.api.post_message(channel_id=message.channel_id, content="频道信息已写入logger", msg_id=message.id)
 
     async def on_guild_member_add(self, member: botpy.user.Member):
@@ -25,7 +26,7 @@ class Client(botpy.Client):
             if re.match(each, message.content):
                 botpy.logger.info("检测到违禁词: %s", message.content)
                 await self.api.recall_message(channel_id=message.channel_id, message_id=message.id, hidetip=False)
-    
+
     async def signin(self, message: botpy.types.message):
         database = {}
         with open("./signin.json", "r", encoding="UTF-8") as db:
@@ -45,7 +46,7 @@ class Client(botpy.Client):
             finally:
                 database[message.author.id]['lastSignInDate'] = datetime.date.today().strftime("%Y-%m-%d")
                 db.write(json.dumps(database, indent=4))
-    
+
     async def query(self, message: botpy.types.message):
         with open("./signin.json", "r", encoding="UTF-8") as db:
             database = json.loads(db.read())
@@ -54,7 +55,7 @@ class Client(botpy.Client):
                 await self.api.post_message(channel_id=message.channel_id, content="金币为：" + coin, msg_id=message.id)
             except KeyError:
                 await self.api.post_message(channel_id=message.channel_id, content="未查询到首次签到记录", msg_id=message.id)
-    
+
     async def question(self, message: botpy.types.message):
         if (message.content == "你是谁"):
             await self.api.post_message(channel_id=message.channel_id, content="服务于成都中医药大学学生自建校园论坛的专属机器人｜CDUTCM BBS｜Chengdu University of Traditional Chinese Medicine BBS", msg_id=message.id)
